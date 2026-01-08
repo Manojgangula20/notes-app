@@ -8,12 +8,19 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+def _truncate_bcrypt_password(password: str) -> str:
+    data = password.encode("utf-8")
+    if len(data) > 72:
+        data = data[:72]
+    return data.decode("utf-8", errors="ignore")
 
 def hash_password(password: str) -> str:
+    password = _truncate_bcrypt_password(password)
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    plain_password = _truncate_bcrypt_password(plain_password)
     return pwd_context.verify(plain_password, hashed_password)
 
 
